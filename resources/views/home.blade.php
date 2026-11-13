@@ -83,9 +83,17 @@
             <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
             @foreach($recommended as $product)
-            <div class="bg-[#1e1b4b] rounded-lg overflow-hidden hover:scale-105 transition transform duration-200 shadow-lg border border-purple-900 group">
+            <div class="bg-[#1e1b4b] rounded-lg overflow-hidden hover:scale-105 transition transform duration-200 shadow-lg border border-purple-900 group relative flex flex-col">
+                
+                <!-- Badge de Oferta (Si tiene precio original) -->
+                @if($product->original_price)
+                    <div class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded font-bold z-10">
+                        -{{ round((($product->original_price - $product->price) / $product->original_price) * 100) }}%
+                    </div>
+                @endif
+
                 <div class="relative">
                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
                     <!-- Badge de Plataforma -->
@@ -93,13 +101,38 @@
                         {{ $product->platform }}
                     </span>
                 </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-sm mb-2 truncate">{{ $product->name }}</h3>
-                    <div class="flex justify-between items-center">
-                        <span class="text-lg font-black text-green-400">${{ $product->price }}</span>
-                        <button class="bg-purple-600 hover:bg-purple-500 text-white p-2 rounded-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        </button>
+                
+                <div class="p-4 flex flex-col flex-grow">
+                    <!-- Categoría / Tipo -->
+                    <span class="text-xs text-purple-300 mb-1">{{ $product->category }}</span>
+                    
+                    <h3 class="font-bold text-sm mb-2 truncate" title="{{ $product->name }}">{{ $product->name }}</h3>
+                    
+                    <!-- Etiquetas (Tags) -->
+                    @if($product->tags)
+                        <div class="flex flex-wrap gap-1 mb-2">
+                            @foreach(array_slice($product->tags, 0, 2) as $tag)
+                                <span class="text-[10px] bg-purple-900 text-purple-200 px-1.5 py-0.5 rounded">#{{ $tag }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="mt-auto">
+                        <!-- Precios -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-black text-green-400">${{ $product->price }}</span>
+                            @if($product->original_price)
+                                <span class="text-sm text-gray-400 line-through">${{ $product->original_price }}</span>
+                            @endif
+                        </div>
+                        
+                        <!-- Stock y Botón -->
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-400">Stock: {{ $product->stock }}</span>
+                            <button class="bg-purple-600 hover:bg-purple-500 text-white p-2 rounded-full transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
